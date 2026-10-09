@@ -214,11 +214,13 @@ public class App {
             return;
         }
 
-        String nuevoNombre = leerTextoNoVacio(scanner, "Ingrese el nuevo nombre del artículo: ");
-        double nuevoPrecio = leerDoubleNoNegativo(scanner, "Ingrese el nuevo precio del artículo: ");
+        System.out.println("\n(Presione ENTER en cualquier campo para mantener el valor actual)");
+
+        String nuevoNombre = leerTextoOpcional(scanner, "Nombre", articulo.getNombre());
+        double nuevoPrecio = leerDoubleOpcional(scanner, "Precio", articulo.getPrecio());
 
         mostrarCategorias(categorias);
-        Categoria nuevaCategoria = pedirCategoriaExistente(scanner, categorias);
+        Categoria nuevaCategoria = pedirCategoriaOpcional(scanner, categorias, articulo.getCategoria());
 
         articulo.setNombre(nuevoNombre);
         articulo.setPrecio(nuevoPrecio);
@@ -228,7 +230,7 @@ public class App {
         if (articulo instanceof ArticuloElectronico) {
             ArticuloElectronico electronico = (ArticuloElectronico) articulo;
 
-            int nuevaGarantia = leerEnteroNoNegativo(scanner, "Ingrese la nueva garantía en meses: ");
+            int nuevaGarantia = leerEnteroOpcional(scanner, "Garantía en meses", electronico.getGarantiaMeses());
             electronico.setGarantiaMeses(nuevaGarantia);
         }
 
@@ -236,7 +238,7 @@ public class App {
         if (articulo instanceof ArticuloAlimenticio) {
             ArticuloAlimenticio alimenticio = (ArticuloAlimenticio) articulo;
 
-            int nuevosDias = leerEnteroNoNegativo(scanner, "Ingrese los nuevos días para vencimiento: ");
+            int nuevosDias = leerEnteroOpcional(scanner, "Días para vencimiento", alimenticio.getDiasParaVencimiento());
             alimenticio.setDiasParaVencimiento(nuevosDias);
         }
 
@@ -411,6 +413,98 @@ public class App {
             }
 
             System.out.println("Error: el texto no puede estar vacío.");
+        }
+    }
+
+    /*
+     * METHOD: leerTextoOpcional
+     * --------------------------------------------------
+     * Lee texto. Si presiona Enter (cadena vacía), conserva el valor actual
+     * Esta función se implementa para mostrar el valor por defecto y aceptarlo
+     * con un Enter, cuando se esté editando un artículo.
+     */
+    public static String leerTextoOpcional(Scanner scanner, String mensaje, String valorActual) {
+        System.out.print(mensaje + " [" + valorActual + "]: ");
+        String entrada = scanner.nextLine().trim();
+        if (entrada.isEmpty()) {
+            return valorActual;
+        }
+        return entrada;
+    }
+
+    /*
+     * METHOD: leerDoubleOpcional
+     * --------------------------------------------------
+     * Lee decimales. Si presiona Enter, conserva el valor actual
+     * Esta función se implementa para mostrar el valor por defecto y aceptarlo
+     * con un Enter, cuando se esté editando un artículo.
+     */
+    public static double leerDoubleOpcional(Scanner scanner, String mensaje, double valorActual) {
+        while (true) {
+            System.out.print(mensaje + " [" + valorActual + "]: ");
+            String entrada = scanner.nextLine().trim();
+            if (entrada.isEmpty()) {
+                return valorActual;
+            }
+            try {
+                double valor = Double.parseDouble(entrada);
+                if (valor < 0) {
+                    System.out.println("Error: el valor no puede ser negativo.");
+                    continue;
+                }
+                return valor;
+            } catch (NumberFormatException e) {
+                System.out.println("Error: debe ingresar un número decimal válido o presionar ENTER para mantener el actual.");
+            }
+        }
+    }
+
+    /*
+     * METHOD: leerEnteroOpcional
+     * --------------------------------------------------
+     * Lee enteros. Si presiona Enter, conserva el valor actual
+     * Esta función se implementa para mostrar el valor por defecto y aceptarlo
+     * con un Enter, cuando se esté editando un artículo.
+     */
+    public static int leerEnteroOpcional(Scanner scanner, String mensaje, int valorActual) {
+        while (true) {
+            System.out.print(mensaje + " [" + valorActual + "]: ");
+            String entrada = scanner.nextLine().trim();
+            if (entrada.isEmpty()) {
+                return valorActual;
+            }
+            try {
+                int valor = Integer.parseInt(entrada);
+                if (valor < 0) {
+                    System.out.println("Error: el valor no puede ser negativo.");
+                    continue;
+                }
+                return valor;
+            } catch (NumberFormatException e) {
+                System.out.println("Error: debe ingresar un número entero válido o presionar ENTER para mantener el actual.");
+            }
+        }
+    }
+
+    public static Categoria pedirCategoriaOpcional(Scanner scanner, ArrayList<Categoria> categorias, Categoria categoriaActual) {
+        while (true) {
+            System.out.print("Ingrese el código de la categoría [" + categoriaActual.getCodigo() + " - " + categoriaActual.getNombre() + "] (ENTER para mantener): ");
+            String entrada = scanner.nextLine().trim();
+
+            if (entrada.isEmpty()) {
+                return categoriaActual;
+            }
+
+            try {
+                int codigo = Integer.parseInt(entrada);
+                Categoria categoria = buscarCategoriaPorCodigo(categorias, codigo);
+                if (categoria != null) {
+                    return categoria;
+                }
+                System.out.println("Error: la categoría no existe.");
+            } catch (NumberFormatException e) {
+                System.out.println("Error: debe ingresar un número entero válido o presionar ENTER para mantener el actual.");
+            }
         }
     }
 
